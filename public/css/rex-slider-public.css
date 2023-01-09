@@ -2,3 +2,14 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+
+.rex-slider-wrapper{
+  position: relative;
+    text-align: center;
+}
+ .rex-slider-text {
+    position: absolute;
+    position: absolute;
+    top: 33%;
+    left: 33%;
+}

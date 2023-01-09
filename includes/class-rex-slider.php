@@ -157,6 +157,7 @@ class Rex_Slider {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+
 	}
 
 	/**
@@ -172,6 +173,12 @@ class Rex_Slider {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		add_action('init', array($plugin_public, 'rex_slider_post_type'));
+		add_action( 'add_meta_boxes', array($plugin_public, 'rex_slider_meta_box'));
+		add_action('save_post', array($plugin_public, 'rex_slider_save_options'));
+		add_shortcode('rex_slider', array($plugin_public, 'rex_slider_shortcode'));
+
+
 
 	}
 
