@@ -75,10 +75,13 @@ class Rex_Slider_Public
          * between the defined hooks and the functions defined in this
          * class.
          */
-        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/rex-slider-public.css', array(), $this->version, 'all');
+        wp_enqueue_style(
+            $this->plugin_name, plugin_dir_url(__FILE__) . 'css/rex-slider-public.css', array(),
+            $this->version, 'all'
+        );
+        wp_enqueue_style('css', plugin_dir_url(__FILE__). 'flexslider/flexslider.css');
 
     }
-
     /**
      * Register the JavaScript for the public-facing side of the site.
      *
@@ -99,34 +102,82 @@ class Rex_Slider_Public
          * class.
          */
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/rex-slider-public.js', array( 'jquery' ), $this->version, false);
+        wp_enqueue_script('jquey-min', plugin_dir_url(__FILE__) . 'flexslider/jquery.flexslider-min.js');
 
     }
+    /**
+     * Function registers slider post type
+     *
+     * @since 1.0.0
+     */
 
-    function rex_slider_post_type()
+    public function rex_slider_postype()
     {
         $args = array(
         'public' => true,
-        'label' => 'Rex Slider',
+        'label' => 'Rex Slides',
+        'singular_label' => 'Add Slides',
         'capability_type'     => 'post',
         'supports' => array(
         'title',
         'thumbnail',
         )
-        );
-        register_post_type('rex_slider', $args);
-    }
 
-    function rex_slider_meta_box()
+        );
+        register_post_type('rex_slides', $args);
+    }
+    /**
+     * Regitser slide taxonomy
+     *
+     * @since 1.0.0
+     */
+
+    public function rex_slider_taxonomy()
+    {
+        $labels = array (
+        'name' => 'Sliders',
+        'singular_name' => 'Slider',
+        'search_items' => 'Search Sliders',
+        'all_items'   => 'All Sliders',
+        'add_new_item' => 'Add new Slider',
+        'update_item' => 'Update slider',
+        'not_found' => 'No sliders found'
+        );
+
+        $args = array(
+        'public' => true,
+        'labels' => $labels,
+        'query_var' => true,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'hierarchical' => true
+
+        );
+        register_taxonomy('rex_slider', 'rex_slides', $args);
+
+    }
+    /**
+     * Adds metabox for rex_slider post type
+     *
+     * @since 1.0.0
+     */
+
+    public function rex_slider_metabox()
     {
         add_meta_box(
             'rex_slider_mb',
             'Rex Slider options',
             array($this, 'rex_slider_mb_form'),
-            'rex_slider'
+            'rex_slides'
         );
     }
+    /**
+     * Adds form fields to meta box
+     *
+     * @since 1.0.0
+     */
 
-    function rex_slider_mb_form()
+    public function rex_slider_mb_form()
     {
 
         global $post;
@@ -144,13 +195,19 @@ class Rex_Slider_Public
     <div class="row">
         <div class="label"><b>Slider Sub heading</b></div>
         <div class="fields">
-                <textarea style="width:50%" name="rex_subheading"><?php echo $rex_subheading; ?></textarea>
+            <textarea style="width:50%" name="rex_subheading"><?php echo $rex_subheading; ?></textarea>
     </div>
     </div>
         </div>
         <?php
     }
-    function rex_slider_save_options( $post_id )
+    /**
+     * Save meta option in database
+     *
+     * @since 1.0.0
+     */
+
+    public function rex_slider_save_options( $post_id )
     {
 
         if(isset($_POST['rex_heading'])) {
@@ -167,43 +224,57 @@ class Rex_Slider_Public
 
     }
 
-    function rex_slider_shortcode($atts)
+    /**
+     * Generates slider shortcode
+     *
+     * @since 1.0.0
+     */
+    public function rex_slider_shortcode($atts)
     {
 
-        extract(
-            shortcode_atts(
-                array(
-                'id' => '',
-                ), $atts 
-            )
+        $atts = shortcode_atts(
+            array(
+            'slider' => ''
+            ), $atts
         );
 
-         $slider_id = $atts['id'];
-
+        $slider = $atts['slider'];
 
         $args = array(
-        'post_type' => 'rex_slider',
-        'posts_per_page' => 1,
+             'post_type'       => 'rex_slides',
+             'posts_per_page'  => -1,
+             'tax_query'       => array(
+                  array(
+                     'taxonomy' => 'rex_slider',
+                     'field'    => 'id',
+                     'terms'    => $slider,
+                  ),
+             ),
         );
 
-        $the_query = new WP_Query($args);
-        if ($the_query->have_posts() ) {
-            while ( $the_query->have_posts() ) {
-                $the_query->the_post();
+        $slides = new WP_Query($args);
 
-                $slider_output  = '<div class="rex-slider-wrapper">';
-                $slider_output .= '<div class="rex-slider-image">' . get_the_post_thumbnail($slider_id, 'full') . '</div>';
-                $slider_output .= '<div class="rex-slider-text">';
-                $slider_output .= '<h4>' . get_post_meta($slider_id, 'rex_heading', true) . '</h4>';
-                $slider_output .= '<h5>' . get_post_meta($slider_id, 'rex_subheading', true) . '</h5>';
-                $slider_output .= '</div>';
-                $slider_output .= '</div>';
+        $slider= '<div class="flexslider">
+			 <ul class="slides">';
 
-                return $slider_output;
+        if ($slides->have_posts()) : while ($slides->have_posts()) : $slides->the_post();
+                $post_id = get_the_ID();
+                $img= get_the_post_thumbnail($post_id, 'full');
+                $heading = get_post_meta($post_id, 'rex_heading', true);
+                $subheading = get_post_meta($post_id, 'rex_subheading', true);
 
-            }
-        }
-        wp_reset_query();
+                $slider.='<li>'.$img.'
+									<h3 class="rex-slider-heading">'.$heading.'</h3>
+									<p class="rex-slider-caption">'.$subheading.'</p>
+									</li>';
+
+        endwhile;
+        endif; wp_reset_query();
+        $slider.= '</ul>
+			 </div>';
+
+        return $slider;
+
 
     }
 

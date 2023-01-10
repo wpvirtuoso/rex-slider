@@ -3,13 +3,20 @@
  * included in this file.
  */
 
-.rex-slider-wrapper{
-  position: relative;
-    text-align: center;
+.flexslider{
+  text-align: center;
 }
- .rex-slider-text {
-    position: absolute;
-    position: absolute;
-    top: 33%;
-    left: 33%;
-}
+ .rex-slider-caption {
+   position: absolute;
+    transform: translate(-31%, -50%);
+    top: 35%;
+    width: 96%;
+    color: #fff !important;
+ }
+ .rex-slider-heading {
+   position: absolute;
+       transform: translate(-31%, -50%);
+       top: 25%;
+       width: 96%;
+       color: #fff !important;
+ }
