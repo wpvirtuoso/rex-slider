@@ -6,17 +6,27 @@
 .flexslider{
   text-align: center;
 }
+
+
+.flexslider .slides li{
+  position: relative;
+}
  .rex-slider-caption {
    position: absolute;
-    transform: translate(-31%, -50%);
-    top: 35%;
-    width: 96%;
-    color: #fff !important;
+     top: 53%;
+     left: 0;
+     width: 100%;
+     color: #fff !important;
+     padding: 1%;
+     display: inline-block;
  }
  .rex-slider-heading {
+   margin-bottom: 15px;
    position: absolute;
-       transform: translate(-31%, -50%);
-       top: 25%;
-       width: 96%;
-       color: #fff !important;
+     top: 43%;
+     left: 0;
+     width: 100%;
+     color: #fff !important;
+     padding: 1%;
+     display: inline-block;
  }

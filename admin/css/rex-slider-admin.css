@@ -2,3 +2,8 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+ #rex_slider_mb{
+   z-index: 1 !important;
+   background: none !important;
+  position: inherit !important;
+ }
